@@ -32,8 +32,6 @@
                                 <label for="clientCPF" class="form-label">CPF:</label>
                                 <input type="text" id="clientCPF" class="form-control"
                                     placeholder="Digite o CPF do cliente" />
-                                <div class="invalid-feedback" id="clientCPFInvalid">CPF inválido. Verifique o número.</div>
-                                <div class="valid-feedback" id="clientCPFValid">CPF válido.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="clientTelefone" class="form-label">Telefone:</label>
@@ -51,12 +49,13 @@
                                 <input type="text" id="clientSalario" class="form-control"
                                     placeholder="Digite o salário do cliente" />
                             </div>
-                            
 
                             <button type="submit" class="btn btn-primary">
-                                Salvar 
-                            
+                                Salvar
                             </button>
+
+                            <button type="button" class="btn btn-info text-white" onclick="mostrarCliente()">Mostrar Cliente</button>
+                            
                         </form>
                     </div>
                 </div>
@@ -83,97 +82,7 @@
         integrity="sha512-Rdk63VC+1UYzGSgd3u2iadi0joUrcwX0IWp2rTh6KXFoAmgOjRS99Vynz1lJPT8dLjvo6JZOqpAHJyfCEZ5KoA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script>
-        // Máscaras
-        $('#clientCPF').mask('000.000.000-00');
-        $('#clientTelefone').mask('(00) 00000-0000');
 
-        $('#clientSalario').maskMoney({ prefix: 'R$ ',
-            allowNegative: false, thousands: '.', decimal: ',', affixesStay: false });
+    <script src="script/script.js"></script>
 
-        // Validação de CPF (regra da Receita Federal)
-        function isValidCPF(cpf) {
-            if (!cpf) return false;
-            // Remove qualquer caractere que não seja dígito
-            cpf = cpf.replace(/\D/g, '');
-
-            if (cpf.length !== 11) return false;
-
-            // Rejeita CPFs com todos os dígitos iguais (ex: 00000000000, 11111111111, ...)
-            if (/^(\d)\1{10}$/.test(cpf)) return false;
-
-            const digits = cpf.split('').map(d => parseInt(d, 10));
-
-            // Calcula o primeiro dígito verificador
-            let sum = 0;
-            for (let i = 0; i < 9; i++) {
-                sum += digits[i] * (10 - i);
-            }
-            let rev = sum % 11;
-            let check1 = (rev < 2) ? 0 : 11 - rev;
-            if (check1 !== digits[9]) return false;
-
-            // Calcula o segundo dígito verificador
-            sum = 0;
-            for (let i = 0; i < 10; i++) {
-                sum += digits[i] * (11 - i);
-            }
-            rev = sum % 11;
-            let check2 = (rev < 2) ? 0 : 11 - rev;
-            if (check2 !== digits[10]) return false;
-
-            return true;
-        }
-
-        $(function () {
-            const $cpf = $('#clientCPF');
-
-            $cpf.on('blur', function () {
-                const raw = $(this).val();
-
-                // Se estiver vazio, remove estados
-                if (!raw || raw.replace(/\D/g, '').length === 0) {
-                    $cpf.removeClass('is-valid is-invalid');
-                    return;
-                }
-
-                const valid = isValidCPF(raw);
-                $cpf.toggleClass('is-valid', valid);
-                $cpf.toggleClass('is-invalid', !valid);
-
-                // Exibe alerta se inválido
-                if (!valid) {
-                    alert('CPF inválido. Verifique o número.');
-                }
-            });
-
-            // Ao focar, limpa as classes para permitir revalidação ao editar
-            $cpf.on('focus', function () {
-                $(this).removeClass('is-valid is-invalid');
-            });
-        });
-
-        document.getElementById('formCadastro').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const name = document.getElementById('clientName').value;
-            const cpf = document.getElementById('clientCPF').value;
-            const telefone = document.getElementById('clientTelefone').value;
-            const dtNascimento = document.getElementById('clientDtNascimento').value;
-            const salario = document.getElementById('clientSalario').value;
-            let salarioNumber = salario.replace('R$ ', '').replace('.', '').replace(',', '.');
-            const credit = salario * 0.3;
-                            
-            alert(
-                'Nome do Cliente: ' + name + '\n' +
-                'CPF: ' + cpf + '\n' +
-                'Telefone: ' + telefone + '\n' +
-                'Data de Nascimento: ' + dtNascimento + '\n' +
-                'Salário: ' + salario + '\n' +
-                'Crédito Disponível: R$ ' + credit.toFixed(2).replace('.', ',')
-            );
-        });
-    </script>
 </body>
-
-</html>
